@@ -8,13 +8,13 @@ import re
 class Client:
 
     def __init__(self, api_uri="https://bitpay.com", insecure=False,
-                 pem=key_utils.generate_pem(), tokens={}):
+                 pem=key_utils.generate_pem(), tokens=None):
 
         self.uri = api_uri
         self.verify = not(insecure)
         self.pem = pem
         self.client_id = key_utils.get_sin_from_pem(pem)
-        self.tokens = tokens
+        self.tokens = tokens or {}
         self.user_agent = 'bitpay-python'
 
     def pair_pos_client(self, code):
