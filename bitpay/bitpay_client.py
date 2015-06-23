@@ -46,7 +46,24 @@ class Client:
             self.tokens = self.token_from_response(response.json())
             return response.json()['data'][0]['pairingCode']
         self.response_error(response)
-
+        
+    def pair_client(self):
+        """
+        GET /tokens
+        Fetches the tokens hash from the server and
+        updates self.tokens
+        """
+        xidentity = key_utils.get_compressed_public_key_from_pem(self.pem)
+        xsignature = key_utils.sign(self.uri+"/tokens", self.pem)
+        headers = {
+            "content-type": "application/json",
+            "accept": "application/json", "X-Identity": xidentity,
+            "X-Signature": xsignature, "X-accept-version": "2.0.0"
+        }  
+        for token in request.get(self.uri + "/tokens", headers=headers).json()["data"]: 
+            self.tokens.update(token)
+        return self.tokens
+        
     def create_invoice(self, params):
         self.verify_invoice_params(params['price'], params['currency'])
         payload = json.dumps(params)
